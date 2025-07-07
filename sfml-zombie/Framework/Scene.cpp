@@ -86,9 +86,17 @@ void Scene::Draw(sf::RenderWindow& window)
 	//		return a->sortingOrder < b->sortingOrder;
 	//	}
 	//);
+	window.setView(worldView);
+	bool isUiView = false;
 
 	for (auto obj : sortedObjects)
 	{
+		if(obj->sortingLayer >= SortingLayers::UI && !isUiView)
+		{
+			window.setView(uiView);
+			isUiView = true;
+		}
+
 		if (obj->GetActive())
 		{
 			obj->Draw(window);
@@ -194,4 +202,24 @@ void Scene::FindGameObjects(const std::string& name, std::vector<GameObject*>& r
 			results.push_back(obj);
 		}
 	}
+}
+
+sf::Vector2f Scene::ScreenToWorld(sf::Vector2i screenPos)
+{
+	return FRAMEWORK.GetWindow().mapPixelToCoords(screenPos, worldView);
+}
+
+sf::Vector2i Scene::WorldToScreen(sf::Vector2f worldPos)
+{
+	return FRAMEWORK.GetWindow().mapCoordsToPixel(worldPos, worldView);
+}
+
+sf::Vector2f Scene::ScreenToUI(sf::Vector2i screenPos)
+{
+	return FRAMEWORK.GetWindow().mapPixelToCoords(screenPos, uiView);
+}
+
+sf::Vector2i Scene::UIToScreen(sf::Vector2f uiPos)
+{
+	return FRAMEWORK.GetWindow().mapCoordsToPixel(uiPos, uiView);
 }
