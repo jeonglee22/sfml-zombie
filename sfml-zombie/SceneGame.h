@@ -2,11 +2,15 @@
 #include "Scene.h"
 
 class Player;
+class Zombie;
 
 class SceneGame : public Scene
 {
 protected:
 	Player* player = nullptr;
+
+	std::list<Zombie*> zombieList;
+	std::list<Zombie*> zombiePool;
 
 public:
 	SceneGame();
@@ -15,8 +19,10 @@ public:
 	void Init() override;
 	//void Release() override;
 	void Enter() override;
-	//void Exit() override;
+	void Exit() override;
 	void Update(float dt) override;
 	//void Draw(sf::RenderWindow& window) override;
+
+	void SpawnZombies(int count);
 };
 
