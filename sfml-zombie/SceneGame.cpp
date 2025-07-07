@@ -16,6 +16,7 @@ void SceneGame::Init()
 	texIds.push_back("graphics/chaser.png");
 	texIds.push_back("graphics/crawler.png");
 	texIds.push_back("graphics/background_sheet.png");
+	texIds.push_back("graphics/crosshair.png");
 
 	AddGameObject(new TileMap("TileMap"));
 
@@ -33,6 +34,8 @@ void SceneGame::Init()
 
 void SceneGame::Enter()
 {
+	FRAMEWORK.GetWindow().setMouseCursorVisible(false);
+
 	sf::Vector2f windowSize = FRAMEWORK.GetWindowSizeF();
 
 	worldView.setSize(windowSize);
@@ -42,10 +45,15 @@ void SceneGame::Enter()
 	uiView.setCenter(windowSize * 0.5f);
 
 	Scene::Enter();
+
+	cursor.setTexture(TEXTURE_MGR.Get("graphics/crosshair.png"));
+	Utils::SetOrigin(cursor, Origins::MC);
 }
 
 void SceneGame::Exit()
 {
+	FRAMEWORK.GetWindow().setMouseCursorVisible(true);
+
 	for (Zombie* zombie : zombieList)
 	{
 		zombie->SetActive(false);
@@ -58,6 +66,8 @@ void SceneGame::Exit()
 
 void SceneGame::Update(float dt)
 {
+	cursor.setPosition(ScreenToUI(InputMgr::GetMousePosition()));
+
 	Scene::Update(dt);
 
 	worldView.setCenter(player->GetPosition());
@@ -71,6 +81,14 @@ void SceneGame::Update(float dt)
 	{
 		SCENE_MGR.ChangeScene(SceneIds::Game);
 	}
+}
+
+void SceneGame::Draw(sf::RenderWindow& window)
+{
+	Scene::Draw(window);
+
+	window.setView(uiView);
+	window.draw(cursor);
 }
 
 void SceneGame::SpawnZombies(int count)
