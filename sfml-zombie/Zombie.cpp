@@ -56,7 +56,7 @@ void Zombie::Reset()
 {
 	player = (Player*) SCENE_MGR.GetCurrentScene()->FindGameObject("Player");
 
-	body.setTexture(TEXTURE_MGR.Get(texId));
+	body.setTexture(TEXTURE_MGR.Get(texId), true);
 	SetOrigin(Origins::MC);
 	SetPosition({ 0.f,0.f });
 	SetRotation(0.f);
@@ -68,11 +68,14 @@ void Zombie::Update(float dt)
 	direction = Utils::GetNormal(player->GetPosition() - position);
 	SetRotation(Utils::Angle(direction));
 	SetPosition(GetPosition() + speed * dt * direction);
+
+	hitBox.UpdateTransform(body, GetLocalBound());
 }
 
 void Zombie::Draw(sf::RenderWindow& window)
 {
 	window.draw(body);
+	hitBox.Draw(window);
 }
 
 void Zombie::SetType(Types type)

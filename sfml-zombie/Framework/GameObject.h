@@ -44,6 +44,15 @@ public:
 	}
 	virtual void SetOrigin(Origins preset) { originPreset = preset; }
 
+	virtual sf::FloatRect GetLocalBound() const
+	{
+		return { 0.f,0.f,0.f,0.f };
+	}
+	virtual sf::FloatRect GetGlobalBound() const
+	{
+		return { 0.f,0.f,0.f,0.f };
+	}
+
 	virtual void Init() = 0;
 	virtual void Release() = 0;
 	virtual void Reset() = 0;

@@ -86,9 +86,11 @@ void Player::Update(float dt)
 	look = Utils::GetNormal(mouseWorldPos - position);
 	SetRotation(Utils::Angle(look));
 	
+	hitBox.UpdateTransform(body, GetLocalBound());
 }
 
 void Player::Draw(sf::RenderWindow& window)
 {
 	window.draw(body);
+	hitBox.Draw(window);
 }
