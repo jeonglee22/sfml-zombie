@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "SceneGame.h"
+#include "Bullet.h"
 
 Player::Player(const std::string& name)
 	:GameObject(name)
@@ -60,6 +61,13 @@ void Player::Reset()
 	{
 		sceneGame = nullptr;
 	}
+
+	for (Bullet* bullet : bulletList)
+	{
+		bullet->SetActive(false);
+		bulletPool.push_back(bullet);
+	}
+	bulletList.clear();
 	
 	body.setTexture(TEXTURE_MGR.Get(textId), true);
 	SetOrigin(Origins::MC);
@@ -68,10 +76,29 @@ void Player::Reset()
 
 	direction = { 0.f, 0.f };
 	look = { 1.f,0.f };
+
+	shootInterval = 0.1f;
+	shootTimer = 0.f;
+
+	hp = maxHp;
 }
 
 void Player::Update(float dt)
 {
+	auto it = bulletList.begin();
+	while (it != bulletList.end())
+	{
+		if (!(*it)->GetActive())
+		{
+			bulletPool.push_back(*it);
+			it = bulletList.erase(it);
+		}
+		else 
+		{
+			it++;
+		}
+	}
+
 	direction.x = InputMgr::GetAxis(Axis::Horizontal);
 	direction.y = InputMgr::GetAxis(Axis::Vertical);
 	if (Utils::Magnitude(direction) > 1.f)
@@ -87,10 +114,49 @@ void Player::Update(float dt)
 	SetRotation(Utils::Angle(look));
 	
 	hitBox.UpdateTransform(body, GetLocalBound());
+
+	shootTimer += dt;
+	if (InputMgr::GetMouseButton(sf::Mouse::Left) && shootTimer > shootInterval)
+	{
+		Shoot();
+		shootTimer = 0.f;
+	}
 }
 
 void Player::Draw(sf::RenderWindow& window)
 {
 	window.draw(body);
 	hitBox.Draw(window);
+}
+
+void Player::Shoot()
+{
+	Bullet* bullet;
+	if (bulletPool.empty())
+	{
+		bullet = new Bullet("Bullet");
+		bullet->Init();
+	}
+	else
+	{
+		bullet = bulletPool.front();
+		bulletPool.pop_front();
+		bullet->SetActive(true);
+	}
+	bullet->Reset();
+	bullet->Fire(position + look * 10.f, look, 1000.f, 10);
+	bulletList.push_back(bullet);
+	sceneGame->AddGameObject(bullet);
+}
+
+void Player::OnDamage(int damage)
+{
+	if (!IsAlive())
+		return;
+
+	hp = Utils::Clamp(hp - damage, 0, maxHp);
+	if (hp == 0)
+	{
+		SCENE_MGR.ChangeScene(SceneIds::Game);
+	}
 }

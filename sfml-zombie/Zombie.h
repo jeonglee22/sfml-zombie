@@ -30,6 +30,7 @@ protected:
 	float attackInterval = 0.f;
 
 	int hp = 0;
+	float attackTimer = 0.f;
 
 	Player* player = nullptr;
 
@@ -61,4 +62,7 @@ public:
 	{
 		return body.getGlobalBounds();
 	}
+
+	const HitBox& GetHitBox() const { return hitBox; }
+	void OnDamage(int damage);
 };

@@ -61,6 +61,9 @@ void Zombie::Reset()
 	SetPosition({ 0.f,0.f });
 	SetRotation(0.f);
 	SetScale({ 1.f,1.f });
+
+	hp = maxHp;
+	attackTimer = 0.f;
 }
 
 void Zombie::Update(float dt)
@@ -70,6 +73,16 @@ void Zombie::Update(float dt)
 	SetPosition(GetPosition() + speed * dt * direction);
 
 	hitBox.UpdateTransform(body, GetLocalBound());
+
+	attackTimer += dt;
+	if (attackTimer > attackInterval)
+	{
+		if (Utils::CheckCollision(hitBox.rect, player->GetHitBox().rect))
+		{
+			player->OnDamage(damage);
+			attackTimer = 0.f;
+		}
+	}
 }
 
 void Zombie::Draw(sf::RenderWindow& window)
@@ -106,5 +119,14 @@ void Zombie::SetType(Types type)
 		break;
 	default:
 		break;
+	}
+}
+
+void Zombie::OnDamage(int damage)
+{
+	hp = Utils::Clamp(hp - damage, 0, maxHp);
+	if (hp == 0)
+	{
+		SetActive(false);
 	}
 }

@@ -37,7 +37,7 @@ void Framework::Do()
 
         // Update
 #ifdef DEF_DEV
-        if (InputMgr::GetKey(sf::Keyboard::F10))
+        if (InputMgr::GetKeyDown(sf::Keyboard::F10))
         {
             Variables::isDrawHitBox = !Variables::isDrawHitBox;
         }
